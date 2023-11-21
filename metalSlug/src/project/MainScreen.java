@@ -46,8 +46,8 @@ class MyPanel extends JPanel implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == startBtn) {
-			System.out.println("스테이지 1로 넘어감");
-			// 스테이지1 맵 만든 후 넘어가는 작업 추가
+			SelectCharacter selectCharacter = new SelectCharacter();
+			setVisible(false);
 		}
 		if (e.getSource() == endBtn) {
 			System.exit(0);
@@ -57,13 +57,13 @@ class MyPanel extends JPanel implements ActionListener {
 
 public class MainScreen extends JFrame {
 	public MainScreen() {
-		setSize(500, 500);
+		setSize(1000, 700);
 		setTitle("메탈슬러그 메인화면");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		BufferedImage backgroundImage = null;
 		try {
-			backgroundImage = ImageIO.read(new File("images/MetalSlugMainScreen.png"));
+			backgroundImage = ImageIO.read(new File("images/MetalSlugMainScreen.jpg"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
