@@ -1,6 +1,8 @@
 package project;
 
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -10,99 +12,155 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
-class Stage1_Panel extends JPanel{
+class Stage1_Panel extends JPanel {
 	BufferedImage heroImage = null;
 	SelectPanel selectPanel = new SelectPanel(null, null, null);
-	//¹Ù´Ú ¿ŞÂÊ¿¡ Ä³¸¯ÅÍ »ı¼º
-	int heroImage_x = 100, heroImage_y = 600;
-	
-	public Stage1_Panel(){
-		int num = selectPanel.getNum();
-		if(num == 0) {
+	// make player on left floor
+	private final int START_X = 100;
+	private final int START_Y = 500;
+	private int heroImage_x, heroImage_y;
+	private int selectedCharacter = 0;
+	private int jumpHeight = 50;
+	private int gravity = 2;
+	private Timer jumpTimer;
+
+	public void setNum(int num) {
+		this.selectedCharacter = num;
+		updateCharacter();
+	}
+
+	public void updateCharacter() {
+		if (selectedCharacter == 0) {
 			Marco hero = new Marco();
 			try {
 				heroImage = ImageIO.read(new File("images/Marco_.jpg"));
-			}catch(IOException e) {
+			} catch (IOException e) {
 				System.out.println("no image");
 				System.exit(1);
 			}
-		}
-		else if(num == 1) {
+		} else if (selectedCharacter == 1) {
 			Tarma hero = new Tarma();
 			try {
 				heroImage = ImageIO.read(new File("images/Tarma_.jpg"));
-			}catch(IOException e) {
+			} catch (IOException e) {
 				System.out.println("no image");
 				System.exit(1);
 			}
-		}
-		else {
+		} else if (selectedCharacter == 2) {
 			Eri hero = new Eri();
 			try {
 				heroImage = ImageIO.read(new File("images/Eri_.png"));
-			}catch(IOException e) {
+			} catch (IOException e) {
 				System.out.println("no image");
 				System.exit(1);
 			}
 		}
-		
+	}
+
+	public Stage1_Panel() {
+		heroImage_x = START_X;
+		heroImage_y = START_Y;
+		jumpTimer = new Timer(20, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (heroImage_y > START_Y - jumpHeight && jumpTimer.isRunning()) {
+					heroImage_y -= gravity;
+				} else {
+					jumpTimer.stop();
+					if (heroImage_y < START_Y) {
+						heroImage_y += gravity;
+					}
+					if (heroImage_y > START_Y) {
+						heroImage_y = START_Y;
+					}
+				}
+				repaint();
+			}
+
+		});
+		jumpTimer.start();
 		addKeyListener(new KeyListener() {
+			boolean jumpKeyPressed = false;
+
 			public void keyPressed(KeyEvent e) {
 				int keycode = e.getKeyCode();
-				switch(keycode) {
+				switch (keycode) {
 				case KeyEvent.VK_UP:
-					//À§ÂÊ Á¶ÁØÇÏ´Â°Å ±¸Çö
+					// aim up
 					break;
 				case KeyEvent.VK_DOWN:
-					//¿õÅ©¸®´Â ÀÌ¹ÌÁö »ğÀÔ
+					// player down
 					break;
 				case KeyEvent.VK_LEFT:
+					// move left
 					heroImage_x -= 5;
-					//¿À¸¥ÂÊÀ¸·Î ¿òÁ÷ÀÌ´Â ÀÌ¹ÌÁö »ğÀÔ
 					break;
 				case KeyEvent.VK_RIGHT:
+					// move right
 					heroImage_x += 5;
-					//¿ŞÂÊÀ¸·Î ¿òÁ÷ÀÌ´Â ÀÌ¹ÌÁö »ğÀÔ
 					break;
 				case KeyEvent.VK_Z:
-					heroImage_y -= 20;
-					//Å¸ÀÌ¸Ó¸¦ ÀÌ¿ëÇÏ¿© Á¡ÇÁÇÑ ÈÄ ´Ù½Ã ³»·Á¿À´Â°Å ±¸Çö
+					// jump
+					jumpKeyPressed = true;
 					break;
 				case KeyEvent.VK_C:
-					//ÃÑ¾Ë ½î´Â°Å ±¸Çö
+					// shoot
 					break;
 				}
 				repaint();
 			}
-			
+
 			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_Z) {
+					// 'z' í‚¤ ë¦´ë¦¬ì¦ˆì‹œ, ì í”„
+					if (jumpKeyPressed) {
+						jump();
+						jumpKeyPressed = false;
+					}
+				}
 			}
+
 			public void keyTyped(KeyEvent arg0) {
-				
+
 			}
-		
+
+			public void jump() {
+				if (heroImage_y == START_Y) {
+					jumpTimer.stop();
+					jumpTimer.start();
+				}
+			}
+
 		});
+
+		this.requestFocus();
+		setFocusable(true);
 	}
+
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		if(heroImage != null) {
+		if (heroImage != null) {
 			g.drawImage(heroImage, heroImage_x, heroImage_y, 80, 100, this);
 		}
 	}
 }
 
+public class Stage1 extends JFrame {
+	static Stage1_Panel stagePanel;
 
-public class Stage1 extends JFrame{
 	public Stage1() {
 		setSize(1000, 700);
 		setTitle("Stage1");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		stagePanel = new Stage1_Panel();
+		add(stagePanel);
 		setVisible(true);
-		add(new Stage1_Panel());
+
 	}
+
 	public static void main(String[] args) {
 		Stage1 stage1 = new Stage1();
 	}
-	
+
 }
