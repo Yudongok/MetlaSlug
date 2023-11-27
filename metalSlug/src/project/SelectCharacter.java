@@ -71,7 +71,7 @@ class SelectPanel extends JPanel implements ActionListener {
 public class SelectCharacter extends JFrame {
 	public SelectCharacter() {
 		setSize(1000, 700);
-		setTitle("ĳ���� ����ȭ��");
+		setTitle("selectCharacter");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		BufferedImage img_Marco = null;

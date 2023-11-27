@@ -1,43 +1,66 @@
 package project;
 
 public class Character {
-	//Ä³¸¯ÅÍ ÀÌµ¿ ÁÂÇ¥
+	// Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½Ç¥
 	protected int x, y;
 	protected int life;
 	protected int damage;
 	protected int speed;
-	
+
 	public Character(int a, int b, int c) {
 		this.life = a;
 		this.damage = b;
 		this.speed = c;
 	}
-	public void move(int x, int y) {
+
+	public void setHeroMove(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
-	
+
+	public int getHero_X() {
+		return this.x;
+	}
+
+	public int getHero_Y() {
+		return this.y;
+	}
+
+	public int getSpeed() {
+		return this.speed;
+	}
+
+	public int getLife() {
+		return this.life;
+	}
+
+	public int getDamage() {
+		return this.damage;
+	}
+
 	public void attack() {
-		
+
 	}
 }
 
-//publicÀÌ ¾Æ´Ï¸é ±âº»ÀûÀ¸·Î µ¿ÀÏ ÆĞÅ°Áö ³»¿¡¼­ »ç¿ë °¡´É
-class Marco extends Character{
+//Marco Life up(life, damage, speed)
+class Marco extends Character {
 	public Marco() {
-		super(120, 20, 30);
+		super(120, 20, 5);
 	}
 
 }
 
-class Tarma extends Character{
+//Tarma Damage up
+class Tarma extends Character {
 	public Tarma() {
-		super(100, 30, 30);
+		super(100, 30, 5);
 	}
 }
 
-class Eri extends Character{
+//Eri Speed up
+class Eri extends Character {
 	public Eri() {
-		super(100, 20, 40);
+		super(100, 20, 8);
 	}
 }
