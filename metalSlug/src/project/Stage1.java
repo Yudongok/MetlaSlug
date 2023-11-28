@@ -31,10 +31,7 @@ class Stage1_Panel extends JPanel {
 	private int speed;
 	private int life;
 	private int damage;
-<<<<<<< HEAD
 	private int bullet_Y;
-=======
->>>>>>> refs/remotes/origin/main
 	private ArrayList<Bullet> bullets = new ArrayList<>();
 	// if pressed "C" then bulletFired == true
 	private boolean bulletFired = false;
@@ -175,10 +172,7 @@ class Stage1_Panel extends JPanel {
 					jump();
 					break;
 				case KeyEvent.VK_C:
-<<<<<<< HEAD
 					bullet_Y = heroImage_Y + 40;
-=======
->>>>>>> refs/remotes/origin/main
 					fireBullet();
 					break;
 				}
@@ -233,11 +227,7 @@ class Stage1_Panel extends JPanel {
 
 			public void fireBullet() {
 				bulletFired = true;
-<<<<<<< HEAD
 				Bullet bullet = new Bullet(direction ? heroImage_X + 80 : heroImage_X, bullet_Y, direction);
-=======
-				Bullet bullet = new Bullet(direction ? heroImage_X + 80 : heroImage_X, heroImage_Y + 40, direction);
->>>>>>> refs/remotes/origin/main
 				bullets.add(bullet);
 				bulletTimer.start();
 			}
@@ -258,7 +248,6 @@ class Stage1_Panel extends JPanel {
 		if (bulletFired) {
 			for (Bullet bullet : bullets) {
 				g.setColor(Color.BLACK);
-<<<<<<< HEAD
 				g.drawOval(bullet.x, bullet.getBullet_Y(), 10, 10);
 				g.setColor(Color.YELLOW);
 				g.fillOval(bullet.x, bullet.getBullet_Y(), 10, 10);
@@ -281,41 +270,18 @@ class Stage1_Panel extends JPanel {
 			} else { // ��硫댁�� 踰��대�� 珥����� 由ъ�ㅽ�몄���� ��嫄�
 				bullets.remove(i);
 				i--; // 由ъ�ㅽ�� ����媛� ������ 諛�由щ��濡� �몃�깆�� 蹂댁��
-=======
-				g.drawOval(bullet.x, heroImage_Y + 40, 10, 10);
-				g.setColor(Color.YELLOW);
-				g.fillOval(bullet.x, heroImage_Y + 40, 10, 10);
 
 			}
 
 		}
 	}
 
-	private void moveBullets() {
-		for (int i = 0; i < bullets.size(); i++) {
-			Bullet bullet = bullets.get(i);
-			if (bullet.x >= 0 && bullet.x <= getWidth()) {
-				if (bullet.bulletDirection) {
-					bullet.x += bulletSpeed;
-				} else {
-					bullet.x -= bulletSpeed;
-				}
-				bullets.set(i, bullet);
-			} else { // 화면을 벗어난 총알은 리스트에서 제거
-				bullets.remove(i);
-				i--; // 리스트 요소가 하나씩 밀리므로 인덱스 보정
->>>>>>> refs/remotes/origin/main
-			}
-		}
-	}
 }
 
 public class Stage1 extends JFrame {
-<<<<<<< HEAD
-	// static�� �ъ�⑺��硫� 媛�泥대�� ���깊��吏� ��怨��� ������ ��洹� 媛���
-=======
+
 	// static을 사용하면 객체를 생성하지 않고도 자원에 접근 가능
->>>>>>> refs/remotes/origin/main
+
 	static Stage1_Panel stagePanel;
 
 	public Stage1() {
