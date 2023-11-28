@@ -18,6 +18,7 @@ import javax.swing.Timer;
 
 class Stage1_Panel extends JPanel {
 	BufferedImage heroImage = null;
+	BufferedImage enemy_GunnerImage = null;
 	SelectPanel selectPanel = new SelectPanel(null, null, null);
 	private Character hero;
 	// make player on left floor
@@ -31,7 +32,12 @@ class Stage1_Panel extends JPanel {
 	private int speed;
 	private int life;
 	private int damage;
+	private int bullet_Y;
+	// 0 is Right, 1 is Left, 2 is Up
+	private int bulletDirection = 0;
+	private int enemyCount = 3;
 	private ArrayList<Bullet> bullets = new ArrayList<>();
+	private ArrayList<Enemy> enemys = new ArrayList<>();
 	// if pressed "C" then bulletFired == true
 	private boolean bulletFired = false;
 	// if direction == true (Right)
@@ -40,6 +46,7 @@ class Stage1_Panel extends JPanel {
 	private Timer moveTimer_R;
 	private Timer moveTimer_L;
 	private Timer bulletTimer;
+	private Timer createEnemyTimer;
 
 	public void setNum(int num) {
 		this.selectedCharacter = num;
@@ -51,7 +58,7 @@ class Stage1_Panel extends JPanel {
 		if (selectedCharacter == 0) {
 			hero = new Marco();
 			try {
-				heroImage = ImageIO.read(new File("images/Marco_.jpg"));
+				heroImage = ImageIO.read(new File("images/Marco/Marco_Right.png"));
 			} catch (IOException e) {
 				System.out.println("no image");
 				System.exit(1);
@@ -59,7 +66,7 @@ class Stage1_Panel extends JPanel {
 		} else if (selectedCharacter == 1) {
 			hero = new Tarma();
 			try {
-				heroImage = ImageIO.read(new File("images/Tarma_.jpg"));
+				heroImage = ImageIO.read(new File("images/Tarma/Tarma_Right.png"));
 			} catch (IOException e) {
 				System.out.println("no image");
 				System.exit(1);
@@ -67,7 +74,7 @@ class Stage1_Panel extends JPanel {
 		} else if (selectedCharacter == 2) {
 			hero = new Eri();
 			try {
-				heroImage = ImageIO.read(new File("images/Eri_.png"));
+				heroImage = ImageIO.read(new File("images/Eri/Eri_Right.png"));
 			} catch (IOException e) {
 				System.out.println("no image");
 				System.exit(1);
@@ -146,31 +153,154 @@ class Stage1_Panel extends JPanel {
 			}
 		});
 
+		createEnemyTimer = new Timer(1000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (enemyCount > 0) {
+					Enemy enemy_Gunner = new Gunner();
+					enemys.add(enemy_Gunner);
+					enemyCount--;
+					if (enemyCount <= 0) {
+						createEnemyTimer.stop();
+					}
+				}
+			}
+
+		});
+		createEnemyTimer.start();
+
+		try {
+			enemy_GunnerImage = ImageIO.read(new File("images/Enemy/Enemy_Gunner.png"));
+			System.out.println("적이미지 불러옴");
+		} catch (IOException r) {
+			System.out.println("no image");
+			System.exit(1);
+		}
+
 		addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
 				int keycode = e.getKeyCode();
 				switch (keycode) {
 				case KeyEvent.VK_UP:
-					// aim up
+					if (selectedCharacter == 0) {
+						hero = new Marco();
+						try {
+							heroImage = ImageIO.read(new File("images/Marco/Marco_Up.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 1) {
+						hero = new Tarma();
+						try {
+							heroImage = ImageIO.read(new File("images/Tarma/Tarma_Up.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 2) {
+						hero = new Eri();
+						try {
+							heroImage = ImageIO.read(new File("images/Eri/Eri_Up.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					}
+					bulletDirection = 2;
 					break;
 				case KeyEvent.VK_DOWN:
 					// player down
 					break;
 				case KeyEvent.VK_LEFT:
-					// move left
+					if (selectedCharacter == 0) {
+						hero = new Marco();
+						try {
+							heroImage = ImageIO.read(new File("images/Marco/Marco_Left.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 1) {
+						hero = new Tarma();
+						try {
+							heroImage = ImageIO.read(new File("images/Tarma/Tarma_.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 2) {
+						hero = new Eri();
+						try {
+							heroImage = ImageIO.read(new File("images/Eri/Eri_.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					}
+					bulletDirection = 1;
 					direction = false;
 					move_L();
 					break;
 				case KeyEvent.VK_RIGHT:
-					// move right
+					if (selectedCharacter == 0) {
+						hero = new Marco();
+						try {
+							heroImage = ImageIO.read(new File("images/Marco/Marco_Right.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 1) {
+						hero = new Tarma();
+						try {
+							heroImage = ImageIO.read(new File("images/Tarma/Tarma_Right.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 2) {
+						hero = new Eri();
+						try {
+							heroImage = ImageIO.read(new File("images/Eri/Eri_Right.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					}
+					bulletDirection = 0;
 					direction = true;
 					move_R();
 					break;
 				case KeyEvent.VK_Z:
-					// jump
+					if (selectedCharacter == 0) {
+						hero = new Marco();
+						try {
+							heroImage = ImageIO.read(new File("images/Marco/Marco_Jump.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 1) {
+						hero = new Tarma();
+						try {
+							heroImage = ImageIO.read(new File("images/Tarma/Tarma_Jump.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					} else if (selectedCharacter == 2) {
+						hero = new Eri();
+						try {
+							heroImage = ImageIO.read(new File("images/Eri/Eri_Jump.png"));
+						} catch (IOException r) {
+							System.out.println("no image");
+							System.exit(1);
+						}
+					}
 					jump();
 					break;
 				case KeyEvent.VK_C:
+					bullet_Y = heroImage_Y + 40;
 					fireBullet();
 					break;
 				}
@@ -181,7 +311,6 @@ class Stage1_Panel extends JPanel {
 				int keycode = e.getKeyCode();
 				switch (keycode) {
 				case KeyEvent.VK_UP:
-					// aim up
 					break;
 				case KeyEvent.VK_DOWN:
 					// player down
@@ -225,7 +354,14 @@ class Stage1_Panel extends JPanel {
 
 			public void fireBullet() {
 				bulletFired = true;
-				Bullet bullet = new Bullet(direction ? heroImage_X + 80 : heroImage_X, heroImage_Y + 40, direction);
+				Bullet bullet;
+				if (bulletDirection == 2) {
+					bullet = new Bullet(heroImage_X + 40, heroImage_Y, bulletDirection);
+				} else if (bulletDirection == 1) {
+					bullet = new Bullet(heroImage_X, bullet_Y, bulletDirection);
+				} else {
+					bullet = new Bullet(heroImage_X + 80, bullet_Y, bulletDirection);
+				}
 				bullets.add(bullet);
 				bulletTimer.start();
 			}
@@ -246,12 +382,18 @@ class Stage1_Panel extends JPanel {
 		if (bulletFired) {
 			for (Bullet bullet : bullets) {
 				g.setColor(Color.BLACK);
-				g.drawOval(bullet.x, heroImage_Y + 40, 10, 10);
+				g.drawOval(bullet.x, bullet.getBullet_Y(), 10, 10);
 				g.setColor(Color.YELLOW);
-				g.fillOval(bullet.x, heroImage_Y + 40, 10, 10);
+				g.fillOval(bullet.x, bullet.getBullet_Y(), 10, 10);
 
 			}
 
+		}
+
+		if (enemy_GunnerImage != null) {
+			for (Enemy enemy : enemys) {
+				g.drawImage(enemy_GunnerImage, enemy.getEnemy_X(), 500, 80, 100, this);
+			}
 		}
 	}
 
@@ -259,22 +401,29 @@ class Stage1_Panel extends JPanel {
 		for (int i = 0; i < bullets.size(); i++) {
 			Bullet bullet = bullets.get(i);
 			if (bullet.x >= 0 && bullet.x <= getWidth()) {
-				if (bullet.bulletDirection) {
+				if (bullet.bulletDirection == 0) {
 					bullet.x += bulletSpeed;
-				} else {
+				} else if (bullet.bulletDirection == 1) {
 					bullet.x -= bulletSpeed;
+				} else {
+					bullet.y -= bulletSpeed;
 				}
 				bullets.set(i, bullet);
-			} else { // 화면을 벗어난 총알은 리스트에서 제거
+			} else {
 				bullets.remove(i);
-				i--; // 리스트 요소가 하나씩 밀리므로 인덱스 보정
+				i--;
+
 			}
+
 		}
 	}
+
 }
 
 public class Stage1 extends JFrame {
+
 	// static을 사용하면 객체를 생성하지 않고도 자원에 접근 가능
+
 	static Stage1_Panel stagePanel;
 
 	public Stage1() {

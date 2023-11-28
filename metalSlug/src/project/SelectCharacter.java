@@ -78,9 +78,9 @@ public class SelectCharacter extends JFrame {
 		BufferedImage img_Tarma = null;
 		BufferedImage img_Eri = null;
 		try {
-			img_Marco = ImageIO.read(new File("images/Marco.png"));
-			img_Tarma = ImageIO.read(new File("images/Tarma.png"));
-			img_Eri = ImageIO.read(new File("images/Eri.png"));
+			img_Marco = ImageIO.read(new File("images/Marco/Marco.png"));
+			img_Tarma = ImageIO.read(new File("images/Tarma/Tarma.png"));
+			img_Eri = ImageIO.read(new File("images/Eri/Eri.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
