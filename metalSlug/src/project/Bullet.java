@@ -15,4 +15,12 @@ public class Bullet {
 		return this.y;
 	}
 
+	public int getBullet_X() {
+		return this.x;
+	}
+
+	public void setBulletDirection(int direction) {
+		this.bulletDirection = direction;
+	}
+
 }

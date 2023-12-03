@@ -19,6 +19,7 @@ import javax.swing.Timer;
 class Stage1_Panel extends JPanel {
 	BufferedImage heroImage = null;
 	BufferedImage enemy_GunnerImage = null;
+	BufferedImage enemy_GunnerDeathImage = null;
 	SelectPanel selectPanel = new SelectPanel(null, null, null);
 	private Character hero;
 	// make player on left floor
@@ -37,9 +38,11 @@ class Stage1_Panel extends JPanel {
 	private int bulletDirection = 0;
 	private int enemyCount = 3;
 	private ArrayList<Bullet> bullets = new ArrayList<>();
+	private ArrayList<Bullet> enemyBullets = new ArrayList<>();
 	private ArrayList<Enemy> enemys = new ArrayList<>();
 	// if pressed "C" then bulletFired == true
 	private boolean bulletFired = false;
+	private boolean enemyBulletFired = false;
 	// if direction == true (Right)
 	private boolean direction = true;
 	private Timer jumpTimer;
@@ -47,6 +50,9 @@ class Stage1_Panel extends JPanel {
 	private Timer moveTimer_L;
 	private Timer bulletTimer;
 	private Timer createEnemyTimer;
+	private Timer statusTimer;
+	private Timer deathTimer;
+	private Timer enemyBulletTimer;
 
 	public void setNum(int num) {
 		this.selectedCharacter = num;
@@ -153,6 +159,18 @@ class Stage1_Panel extends JPanel {
 			}
 		});
 
+		enemyBulletTimer = new Timer(1000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (enemys == null) {
+					System.out.println("적이 비었습니다.");
+				} else {
+					moveEnemyBullets();
+					repaint();
+				}
+			}
+		});
+		enemyBulletTimer.start();
+
 		createEnemyTimer = new Timer(1000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (enemyCount > 0) {
@@ -167,6 +185,55 @@ class Stage1_Panel extends JPanel {
 
 		});
 		createEnemyTimer.start();
+
+		try {
+			enemy_GunnerDeathImage = ImageIO.read(new File("images/Enemy/Enemy_GunnerDeath.png"));
+		} catch (IOException r) {
+			System.out.println("no image");
+			System.exit(1);
+		}
+
+		statusTimer = new Timer(10, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// myBullet hit enemy then delete enemy
+				for (int i = 0; i < bullets.size(); i++) {
+					Bullet heroBullet = bullets.get(i);
+					for (int j = 0; j < enemys.size(); j++) {
+						Enemy enemy = enemys.get(j);
+						if (heroBullet.getBullet_X() >= enemy.getEnemy_X()
+								&& heroBullet.getBullet_X() <= enemy.getEnemy_X() + 80) {
+							bullets.remove(i);
+							i--;
+							enemy.setEnemy_Life(enemy.getEnemy_Life() - damage);
+							if (enemy.getEnemy_Life() <= 0) {
+								deathTimer = new Timer(5000, new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
+										repaint();
+									}
+								});
+								deathTimer.setRepeats(false);
+								deathTimer.start();
+								enemys.remove(j);
+								j--;
+							}
+						}
+					}
+				}
+				// for Trace()
+				for (int i = 0; i < enemys.size(); i++) {
+					Enemy enemy_Gunner = enemys.get(i);
+					if (enemy_Gunner.getEnemy_X() + 40 <= heroImage_X + 40) {
+						// System.out.println("적이 오른쪽 조준");
+						enemy_Gunner.setEnemy_Direction(1);
+					} else if (enemy_Gunner.getEnemy_X() + 40 > heroImage_X + 40) {
+						// System.out.println("적의 왼쪽 조준");
+						enemy_Gunner.setEnemy_Direction(0);
+					}
+					fireEnemyBullets();
+				}
+			}
+		});
+		statusTimer.start();
 
 		try {
 			enemy_GunnerImage = ImageIO.read(new File("images/Enemy/Enemy_Gunner.png"));
@@ -371,6 +438,12 @@ class Stage1_Panel extends JPanel {
 		setFocusable(true);
 	}
 
+	public void drawEnemyDeathImage(Graphics g, int x, int y) {
+		if (enemy_GunnerDeathImage != null) {
+			g.drawImage(enemy_GunnerDeathImage, x, y, 80, 100, this);
+		}
+	}
+
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (heroImage != null) {
@@ -387,12 +460,23 @@ class Stage1_Panel extends JPanel {
 				g.fillOval(bullet.x, bullet.getBullet_Y(), 10, 10);
 
 			}
+		}
 
+		if (enemyBulletFired) {
+			for (Bullet bullet : enemyBullets) {
+				g.setColor(Color.BLACK);
+				g.drawOval(bullet.x, bullet.getBullet_Y(), 10, 10);
+				g.setColor(Color.RED);
+				g.fillOval(bullet.x, bullet.getBullet_Y(), 10, 10);
+
+			}
 		}
 
 		if (enemy_GunnerImage != null) {
 			for (Enemy enemy : enemys) {
 				g.drawImage(enemy_GunnerImage, enemy.getEnemy_X(), 500, 80, 100, this);
+				if (enemy.isDead())
+					g.drawImage(enemy_GunnerDeathImage, enemy.getEnemy_X(), 500, 80, 100, this);
 			}
 		}
 	}
@@ -418,6 +502,46 @@ class Stage1_Panel extends JPanel {
 		}
 	}
 
+	public void moveEnemyBullets() {
+		for (int i = 0; i < enemyBullets.size(); i++) {
+			Bullet enemyBullet = enemyBullets.get(i);
+			if (enemyBullet.x >= 0 && enemyBullet.x <= getWidth()) {
+				if (enemyBullet.bulletDirection == 0) {
+					// System.out.println("적총알 오른쪽으로 감");
+					enemyBullet.x += bulletSpeed;
+				} else if (enemyBullet.bulletDirection == 1) {
+					// System.out.println("적총알 왼쪽으로 감");
+					enemyBullet.x -= bulletSpeed;
+				}
+				enemyBullets.set(i, enemyBullet);
+			} else {
+				enemyBullets.remove(i);
+				i--;
+
+			}
+
+		}
+
+	}
+
+	public void fireEnemyBullets() {
+		for (int i = 0; i < enemys.size(); i++) {
+			Enemy enemy_Gunner = enemys.get(i);
+			if (enemy_Gunner.isAttack(heroImage_X)) {
+				Bullet enemyBullet = null;
+				enemyBulletFired = true;
+				if (enemy_Gunner.getEnemy_X() + 40 <= heroImage_X + 40) {
+					enemyBullet = new Bullet(enemy_Gunner.getEnemy_X() + 80, 540, 0);
+					// System.out.println("적이 오른쪽 조준");
+				} else if (enemy_Gunner.getEnemy_X() + 40 > heroImage_X + 40) {
+					enemyBullet = new Bullet(enemy_Gunner.getEnemy_X(), 540, 1);
+					// System.out.println("적이 왼쪽 조준");
+				}
+				enemyBullets.add(enemyBullet);
+			}
+		}
+
+	}
 }
 
 public class Stage1 extends JFrame {
